@@ -1,0 +1,888 @@
+<!doctype html>
+<html lang="th" class="h-full scroll-smooth">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Healthy Advice - มิติใหม่แห่งการดูแลสุขภาพกายและจิตเวช</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { thai: ['Noto Sans Thai', 'sans-serif'] },
+          colors: {
+            brand: {
+              primary: '#1e40af', 
+              secondary: '#3b82f6',
+              dark: '#1e293b'
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body { font-family: 'Noto Sans Thai', sans-serif; }
+    .nav-link { position: relative; transition: color 0.3s; }
+    .nav-link::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px; background: #1e40af; transition: width 0.3s; }
+    .nav-link:hover::after { width: 100%; }
+    .app-logo-mock {
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+      position: relative;
+    }
+    .app-logo-mock::before {
+      content: '✦';
+      position: absolute;
+      color: #93c5fd;
+      font-size: 1.5rem;
+      top: 15%;
+      right: 20%;
+    }
+  </style>
+ </head>
+ <body class="bg-slate-50/50 text-slate-800 min-h-full">
+
+  <div id="auth-screen" class="fixed inset-0 bg-[#f8fafc] z-50 flex flex-col items-center justify-center p-4 overflow-y-auto">
+    <div class="text-center mb-6 flex flex-col items-center">
+      <div class="w-24 h-24 app-logo-mock rounded-3xl flex flex-col items-center justify-center shadow-lg mb-2 border-4 border-white">
+        <div class="relative w-12 h-12 flex items-center justify-center">
+          <i data-lucide="heart" class="w-12 h-12 text-white/90 absolute"></i>
+          <i data-lucide="navigation" class="w-6 h-6 text-cyan-300 transform rotate-45 z-10 translate-x-0.5 -translate-y-0.5"></i>
+        </div>
+        <span class="text-[9px] font-bold text-white tracking-wider mt-1 font-mono">HEALTHY ADVICE</span>
+      </div>
+      <h1 class="text-3xl font-bold text-slate-900 tracking-tight">Healthy Advice</h1>
+      <p class="text-sm text-slate-500 mt-1">ระบบคัดกรองสุขภาพและปรึกษาจิตแพทย์ออนไลน์</p>
+    </div>
+
+    <div class="bg-white w-full max-w-[450px] rounded-3xl shadow-xl shadow-slate-200/60 p-8 border border-slate-100">
+      
+      <div id="login-view">
+        <h2 class="text-2xl font-bold text-slate-900 mb-1">เข้าสู่ระบบ</h2>
+        <p class="text-sm text-slate-400 mb-6">กรุณากรอกบัญชีผู้ใช้ของคุณเพื่อดำเนินการต่อ</p>
+        
+        <form id="login-form" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1.5">อีเมลผู้ใช้ (Username)</label>
+            <input type="email" id="login-email" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-blue-100 transition text-sm" placeholder="example@email.com" value="admin@healthy.com">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1.5">รหัสผ่าน</label>
+            <input type="password" id="login-password" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-blue-100 transition text-sm" placeholder="••••••••" value="1234">
+          </div>
+          <button type="submit" class="w-full py-3 bg-brand-primary hover:bg-blue-800 text-white rounded-xl font-medium text-sm transition flex items-center justify-center gap-2 mt-2 shadow-lg shadow-blue-900/10">
+            <i data-lucide="log-in" class="w-4 h-4"></i>เข้าสู่ระบบ
+          </button>
+        </form>
+        <div class="text-center text-xs text-slate-500 mt-5">
+          ยังไม่มีบัญชีใช้งาน? <button onclick="toggleAuthMode('register')" class="text-brand-primary hover:underline font-bold">สมัครสมาชิกใหม่ที่นี่</button>
+        </div>
+      </div>
+
+      <div id="register-view" class="hidden">
+        <h2 class="text-2xl font-bold text-slate-900 mb-1">สมัครสมาชิกใหม่</h2>
+        <p class="text-sm text-slate-400 mb-6">สร้างบัญชีสำหรับเข้าใช้งานระบบส่งนัดหมายและค้นหาอาการ</p>
+        
+        <form id="register-form" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1.5">ชื่อ-นามสกุล</label>
+            <input type="text" id="reg-name" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-primary transition text-sm" placeholder="สมชาย ตั้งใจดี">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1.5">อีเมล (ใช้สำหรับเข้าสู่ระบบ)</label>
+            <input type="email" id="reg-email" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-primary transition text-sm" placeholder="example@email.com">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1.5">รหัสผ่าน</label>
+            <input type="password" id="reg-password" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-primary transition text-sm" placeholder="ตั้งรหัสผ่านของคุณ">
+          </div>
+          <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium text-sm transition flex items-center justify-center gap-2 mt-2 shadow-lg">
+            <i data-lucide="user-plus" class="w-4 h-4"></i>ลงทะเบียนบัญชี
+          </button>
+        </form>
+        <div class="text-center text-xs text-slate-500 mt-5">
+          มีบัญชีอยู่แล้ว? <button onclick="toggleAuthMode('login')" class="text-brand-primary hover:underline font-bold">กลับไปหน้าเข้าสู่ระบบ</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <div id="main-layout" class="hidden">
+    
+    <nav class="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md border-b border-slate-100 z-40">
+      <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        <a href="#home" class="flex items-center gap-2.5">
+          <div class="w-9 h-9 app-logo-mock rounded-xl flex items-center justify-center shadow-sm">
+            <div class="relative w-5 h-5 flex items-center justify-center">
+              <i data-lucide="heart" class="w-5 h-5 text-white absolute"></i>
+              <i data-lucide="navigation" class="w-2.5 h-2.5 text-cyan-300 transform rotate-45 z-10 translate-x-0.5 -translate-y-0.5"></i>
+            </div>
+          </div>
+          <span class="text-xl font-bold text-slate-900 tracking-tight font-mono">HEALTHY ADVICE</span>
+        </a>
+        
+        <div class="hidden md:flex items-center gap-6 text-[15px] font-medium text-slate-600">
+          <a href="#home" class="nav-link text-slate-900">หน้าแรก</a>
+          <a href="#about" class="nav-link">เกี่ยวกับเรา</a>
+          <a href="#services" class="nav-link">บริการ</a>
+          <a href="#appointment" class="nav-link">นัดหมาย</a>
+          <a href="#search-symptoms" class="nav-link">คัดกรองอาการและแชทสด</a>
+          <a href="#contact" class="nav-link">ติดต่อ</a>
+          
+          <button onclick="triggerAdminVerification()" id="nav-admin-btn" class="text-blue-700 font-bold bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition text-xs shadow-sm border border-blue-200">
+            <i data-lucide="database" class="w-3.5 h-3.5"></i> คุมระบบหลังบ้าน (แอดมิน)
+          </button>
+          
+          <div class="h-4 w-px bg-slate-200"></div>
+          
+          <div class="flex items-center gap-2">
+            <button onclick="openUserProfileModal()" class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs font-semibold text-slate-700 transition">
+              <i data-lucide="user" class="w-3.5 h-3.5 text-brand-primary"></i>
+              <span id="user-display-name">User</span>
+            </button>
+            <button onclick="logout()" class="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-xs font-medium flex items-center gap-1 transition">
+              <i data-lucide="log-out" class="w-3.5 h-3.5"></i> ออกจากระบบ
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <section id="home" class="pt-32 pb-16 px-6 max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12 min-h-[85vh]">
+      <div class="flex-1 space-y-6">
+        <div class="inline-flex items-center gap-2 bg-blue-50 text-brand-primary px-3.5 py-1.5 rounded-full text-xs font-semibold border border-blue-100">
+          <i data-lucide="shield-check" class="w-4 h-4"></i> ศูนย์แพทย์ดูแลสุขภาพกายและจิตเวชครบวงจร
+        </div>
+        <h1 class="text-4xl md:text-5xl font-bold text-slate-900 leading-[1.25]">
+          ดูแลสุขภาพของคุณ<br>ด้วยทีมแพทย์มืออาชีพ
+        </h1>
+        <p class="text-slate-500 text-sm">เราพร้อมดูแลคุณและครอบครัวด้วยเทคโนโลยีการแพทย์ที่ทันสมัย และทีมแพทย์ผู้เชี่ยวชาญเฉพาะทาง</p>
+        
+        <div class="bg-white p-3 rounded-2xl shadow-xl border border-slate-100 max-w-lg space-y-3">
+          <div class="relative">
+            <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+            <input type="text" id="symptom-search-input" oninput="searchSymptoms()" class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-primary transition text-xs" placeholder="พิมพ์อาการที่พบ เช่น ปวดหัว, ซึมเศร้า, เเครียด...">
+          </div>
+          <div id="search-results-box" class="hidden bg-slate-50 rounded-xl p-3 border border-slate-100 text-xs max-h-[180px] overflow-y-auto space-y-2"></div>
+        </div>
+
+        <div class="flex items-center gap-4 pt-2">
+          <a href="#search-symptoms" class="px-5 py-3 bg-brand-primary hover:bg-blue-800 text-white rounded-xl font-medium transition shadow-md flex items-center gap-2 text-sm">
+            <i data-lucide="message-square" class="w-4 h-4"></i> ระบบคัดกรอง & แชทสดกับแอดมิน
+          </a>
+          <a href="#appointment" class="px-5 py-3 bg-white hover:bg-slate-50 text-slate-600 border border-slate-200 rounded-xl font-medium transition flex items-center gap-2 text-sm">
+            <i data-lucide="calendar" class="w-4 h-4"></i> นัดหมายแพทย์
+          </a>
+        </div>
+      </div>
+      
+      <div class="flex-1 flex justify-center relative w-full max-w-md">
+        <div class="w-full aspect-[4/4] bg-gradient-to-br from-blue-900 to-blue-700 rounded-[32px] shadow-xl relative flex flex-col items-center justify-center p-8 text-white">
+          <div class="relative w-28 h-28 flex items-center justify-center bg-white/10 rounded-full border border-white/20 p-4 mb-4">
+            <i data-lucide="heart" class="w-24 h-24 text-white absolute"></i>
+            <i data-lucide="navigation" class="w-12 h-12 text-cyan-300 transform rotate-45 z-10 translate-x-1 -translate-y-1"></i>
+          </div>
+          <h2 class="text-xl font-bold tracking-widest font-mono">HEALTHY ADVICE</h2>
+          <p class="text-xs text-blue-200 mt-2">มีคนไข้ไว้วางใจแล้วมากกว่า 10,000+ คน</p>
+          
+          <div class="absolute -bottom-3 left-1/2 transform -translate-x-1/2 bg-white px-4 py-2 rounded-xl shadow-md border border-slate-50 flex items-center gap-1.5 whitespace-nowrap text-slate-800">
+            <i data-lucide="heart-handshake" class="w-4 h-4 text-blue-600"></i>
+            <span class="text-xs font-bold text-slate-700">แอดมินและจิตแพทย์พร้อมคุยสด 24 ชม.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="py-20 bg-white border-t border-b border-slate-100 px-6">
+      <div class="max-w-7xl mx-auto space-y-16">
+        <div class="text-center max-w-2xl mx-auto space-y-3">
+          <h2 class="text-3xl font-bold text-slate-900">เกี่ยวกับเรา</h2>
+          <p class="text-slate-500 text-[15px] leading-relaxed">Healthy Advice มุ่งมั่นในการให้บริการทางการแพทย์ที่มีคุณภาพสูง เข้าถึงได้ง่าย</p>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div class="space-y-8">
+            <h3 class="text-xl font-bold text-brand-primary mb-6">วิสัยทัศน์และพันธกิจ</h3>
+            <div class="flex gap-4">
+              <div class="w-10 h-10 rounded-xl bg-blue-50 text-brand-primary flex items-center justify-center shrink-0">
+                <i data-lucide="eye" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-slate-800 mb-1">วิสัยทัศน์</h4>
+                <p class="text-sm text-slate-500">เป็นศูนย์การแพทย์ชั้นนำที่ให้บริการดูแลสุขภาพแบบองค์รวมด้วยมาตรฐานสากล</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gradient-to-br from-blue-50 to-slate-50 border border-slate-100 rounded-3xl p-8 text-center">
+            <div class="text-3xl font-bold text-brand-primary mb-1">20+</div>
+            <div class="text-xs font-medium text-slate-400">แพทย์ผู้เชี่ยวชาญเฉพาะทาง</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="services" class="py-20 px-6 max-w-7xl mx-auto space-y-12">
+      <div class="text-center max-w-xl mx-auto space-y-3">
+        <h2 class="text-3xl font-bold text-slate-900">บริการทางการแพทย์</h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+          <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center"><i data-lucide="brain" class="w-5 h-5"></i></div>
+          <h3 class="font-bold text-slate-900">จิตเวชและสุขภาพจิต</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">ปรึกษาปัญหาความเครียด โรคซึมเศร้า วิตกกังวล โดยเปิดแชทคุยสดกับแอดมินได้ทันที</p>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+          <div class="w-10 h-10 bg-blue-50 text-brand-primary rounded-xl flex items-center justify-center"><i data-lucide="clipboard-list" class="w-5 h-5"></i></div>
+          <h3 class="font-bold text-slate-900">ตรวจสุขภาพกาย</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">โปรแกรมตรวจสุขภาพประจำปีครบวงจร เหมาะสำหรับทุกเพศทุกวัย</p>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+          <div class="w-10 h-10 bg-emerald-50 text-emerald-500 rounded-xl flex items-center justify-center"><i data-lucide="stethoscope" class="w-5 h-5"></i></div>
+          <h3 class="font-bold text-slate-900">อายุรกรรมทั่วไป</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">ดูแลรักษาโรคภายในทั่วไป เบาหวาน ความดัน ไขมันในเลือดสูง</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="appointment" class="py-20 bg-slate-50 border-t border-b border-slate-100 px-6">
+      <div class="max-w-[700px] mx-auto space-y-10">
+        <div class="text-center space-y-3">
+          <h2 class="text-3xl font-bold text-slate-900">นัดหมายแพทย์</h2>
+          <p class="text-slate-500 text-sm">กรอกข้อมูลด้านล่างเพื่อจองคิวพบแพทย์หรือจิตแพทย์</p>
+        </div>
+        
+        <form id="appointment-form" class="bg-white border border-slate-200 rounded-3xl p-8 space-y-5 shadow-sm">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-2">ชื่อ-นามสกุลผู้ป่วย</label>
+            <input type="text" id="ap-name" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:border-brand-primary transition" placeholder="กรอกชื่อ-นามสกุล">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-2">เบอร์โทรศัพท์ติดต่อ</label>
+            <input type="tel" id="ap-phone" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:border-brand-primary transition" placeholder="0XX-XXX-XXXX">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-2">เลือกแพทย์ผู้เชี่ยวชาญ</label>
+            <select id="ap-doctor" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:border-brand-primary transition appearance-none">
+              <option>พญ.นภา วงศ์ดี (จิตแพทย์ผู้เชี่ยวชาญด้านโรคซึมเศร้าและความเครียด)</option>
+              <option>นพ.สมชาย ตั้งใจดี (อายุรแพทย์หัวใจ)</option>
+              <option>พญ.พิมพ์ฉัตร สมใจ (กุมารแพทย์อาวุโส)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-2">วันที่นัดหมาย</label>
+            <input type="date" id="ap-date" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:border-brand-primary transition">
+          </div>
+          <button type="submit" class="w-full py-3.5 bg-brand-primary hover:bg-blue-800 text-white font-medium rounded-xl transition">
+            ยืนยันส่งข้อมูลนัดหมาย
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <section id="search-symptoms" class="py-20 px-6 max-w-4xl mx-auto space-y-12">
+      <div class="text-center space-y-3">
+        <h2 class="text-3xl font-bold text-slate-900">ระบบคัดกรองและห้องแชทช่วยเหลือผู้ป่วยจิตเวช</h2>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div class="lg:col-span-12 bg-white rounded-3xl p-6 shadow-md border border-slate-100 flex flex-col min-h-[500px]">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
+              <h3 id="chat-header-title" class="font-bold text-slate-800 text-sm flex items-center gap-1">
+                <i data-lucide="bot" class="w-4 h-4 text-brand-primary"></i> หมอจำลอง AI คัดกรองอาการเบื้องต้น
+              </h3>
+            </div>
+            <span id="chat-mode-badge" class="px-2.5 py-1 bg-blue-50 text-blue-700 rounded-full text-[10px] font-bold">โหมดบอทอัตโนมัติ</span>
+          </div>
+
+          <div id="chat-box" class="flex-1 overflow-y-auto space-y-3 p-3 text-xs max-h-[320px] border border-slate-100 rounded-xl bg-slate-50/50 mb-4">
+            <div class="bg-blue-50 text-slate-700 p-3 rounded-2xl rounded-tl-none max-w-[85%]">
+              สวัสดีครับ ผมคือระบบคัดกรองอาการเบื้องต้น คุณเริ่มมีอาการไม่สบายในส่วนไหนครับ?
+            </div>
+          </div>
+
+          <div id="live-chat-input-area" class="hidden flex gap-2 border-t border-slate-100 pt-3">
+            <input type="text" id="live-chat-user-msg" class="flex-1 px-4 py-2 border rounded-xl text-xs focus:outline-none focus:border-brand-primary" placeholder="พิมพ์ข้อความคุยสดกับแอดมินระบายความในใจที่นี่...">
+            <button onclick="sendLiveMessageFromUser()" class="px-4 py-2 bg-brand-primary text-white text-xs font-bold rounded-xl hover:bg-blue-800 transition flex items-center gap-1">
+              ส่ง <i data-lucide="send" class="w-3 h-3"></i>
+            </button>
+          </div>
+
+          <div id="chat-options" class="flex flex-wrap gap-2 mt-2">
+            <button onclick="startChatFlow('head')" class="px-3 py-2 bg-slate-100 hover:bg-brand-primary hover:text-white rounded-xl transition text-xs font-medium">ปวดศีรษะ / ไข้</button>
+            <button onclick="startChatFlow('stomach')" class="px-3 py-2 bg-slate-100 hover:bg-brand-primary hover:text-white rounded-xl transition text-xs font-medium">ปวดท้อง / ทางเดินอาหาร</button>
+            <button onclick="startChatFlow('mental')" class="px-3 py-2 bg-blue-50 hover:bg-blue-700 hover:text-white text-blue-700 rounded-xl transition text-xs font-medium border border-blue-200">เครียด / ซึมเศร้า / จิตเวช (ดิ่ง)</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="py-20 border-t border-slate-100 px-6 max-w-7xl mx-auto text-center space-y-6">
+      <h2 class="text-2xl font-bold text-slate-900">สายด่วนช่วยเหลือฉุกเฉิน</h2>
+      <div class="max-w-md mx-auto bg-slate-900 text-white p-6 rounded-2xl">
+        <h3 class="font-bold text-blue-300 mb-2">📞 สายด่วนสุขภาพจิต (กรมสุขภาพจิต)</h3>
+        <p class="text-xs text-slate-300 mb-4">โทรปรึกษาได้ฟรีตลอด 24 ชั่วโมง</p>
+        <a href="tel:1323" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-xl text-xs font-bold transition">โทรเลย 1323</a>
+      </div>
+    </section>
+
+    <footer class="bg-white border-t border-slate-100 py-6 text-center text-xs text-slate-400">
+      <p>&copy; 2026 Healthy Advice. All rights reserved.</p>
+    </footer>
+  </div>
+
+
+  <div id="user-profile-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl p-6 border border-slate-100 flex flex-col max-h-[85vh]">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+        <div class="flex items-center gap-2">
+          <div class="p-2 bg-blue-50 text-brand-primary rounded-xl"><i data-lucide="user-cog" class="w-5 h-5"></i></div>
+          <h3 class="text-lg font-bold text-slate-900">โปรไฟล์และจัดการบัญชีของฉัน</h3>
+        </div>
+        <button onclick="closeUserProfileModal()" class="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-6 overflow-y-auto pr-1 flex-1">
+        <div class="md:col-span-5 space-y-5 border-r border-slate-100 pr-4 flex flex-col justify-between">
+          <form id="update-profile-form" class="space-y-3 text-xs">
+            <div>
+              <label class="block font-semibold text-slate-600 mb-1">ชื่อบัญชีผู้ใช้งาน</label>
+              <input type="text" id="prof-name" required class="w-full px-3 py-2 border rounded-xl focus:border-brand-primary focus:outline-none bg-slate-50">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-600 mb-1">อีเมลบัญชี (แก้ไขไม่ได้)</label>
+              <input type="email" id="prof-email" disabled class="w-full px-3 py-2 border bg-slate-100 rounded-xl text-slate-400 cursor-not-allowed">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-600 mb-1">รหัสผ่านบัญชี</label>
+              <input type="password" id="prof-password" required class="w-full px-3 py-2 border rounded-xl focus:border-brand-primary focus:outline-none">
+            </div>
+            <button type="submit" class="w-full py-2 bg-brand-primary text-white font-medium rounded-xl hover:bg-blue-800 transition">บันทึกข้อมูลและอัปเดตบัญชี</button>
+          </form>
+
+          <div class="pt-4 border-t border-slate-100 text-xs">
+            <h5 class="font-bold text-rose-600 mb-1 flex items-center gap-1"><i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> พื้นที่อันตราย</h5>
+            <p class="text-[11px] text-slate-400 mb-2">เมื่อลบบัญชีแล้ว ข้อมูลการจองคิวและโปรไฟล์ทั้งหมดจะถูกทำลายถาวร</p>
+            <button type="button" onclick="deleteCurrentUserAccount()" class="w-full py-2 bg-rose-100 hover:bg-rose-600 text-rose-700 hover:text-white font-bold rounded-xl transition text-[11px] flex items-center justify-center gap-1">
+              <i data-lucide="user-x" class="w-3.5 h-3.5"></i> ลบบัญชีผู้ใช้งานนี้ถาวร
+            </button>
+          </div>
+        </div>
+
+        <div class="md:col-span-7 flex flex-col h-full">
+          <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">สถานะรายการนัดหมายของคุณ</h4>
+          <div class="overflow-y-auto flex-1 border border-slate-100 rounded-xl bg-slate-50/50 p-2 max-h-[320px]">
+            <div id="user-own-appointments" class="space-y-2"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="admin-verify-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-xl p-6 border border-slate-100">
+      <div class="flex items-center gap-2.5 mb-3">
+        <div class="p-2 bg-blue-50 text-blue-700 rounded-xl"><i data-lock-open data-lucide="lock" class="w-5 h-5"></i></div>
+        <div>
+          <h3 class="text-lg font-bold text-slate-900">การยืนยันสิทธิ์แอดมิน</h3>
+          <p class="text-xs text-slate-400">กรุณากรอกรหัสผ่านแอดมินเพื่อเข้าสู่แดชบอร์ดจัดการระบบ</p>
+        </div>
+      </div>
+      
+      <form id="admin-verify-form" class="space-y-4 text-sm">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1.5">อีเมลผู้ดูแลระบบ (Admin Email)</label>
+          <input type="email" id="verify-email-input" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none" placeholder="admin@healthy.com">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1.5">รหัสผ่านแอดมิน (Admin Password)</label>
+          <input type="password" id="verify-pass-input" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none" placeholder="••••">
+        </div>
+        <div class="flex gap-2 justify-end text-xs font-medium pt-2">
+          <button type="button" onclick="closeAdminVerifyModal()" class="px-4 py-2 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 transition">ยกเลิก</button>
+          <button type="submit" class="px-4 py-2 bg-blue-700 text-white rounded-xl hover:bg-blue-800 transition">ตรวจสอบข้อมูล</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <div id="admin-dashboard-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 text-slate-100 w-full max-w-6xl rounded-3xl shadow-2xl p-6 border border-slate-800 max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-5">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 app-logo-mock rounded-xl flex items-center justify-center shadow-md">
+            <div class="relative w-6 h-6 flex items-center justify-center">
+              <i data-lucide="heart" class="w-6 h-6 text-white absolute"></i>
+              <i data-lucide="navigation" class="w-3 h-3 text-cyan-300 transform rotate-45 z-10 translate-x-0.5 -translate-y-0.5"></i>
+            </div>
+          </div>
+          <div>
+            <h2 class="text-xl font-bold text-white">แผงควบคุมระบบหลังบ้าน (Admin Dashboard)</h2>
+          </div>
+        </div>
+        <button onclick="closeAdminDashboardModal()" class="p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 overflow-y-auto flex-1">
+        
+        <div class="lg:col-span-4 flex flex-col gap-4">
+          <div class="bg-slate-950 border border-blue-900/60 rounded-2xl p-3 flex flex-col h-[220px]">
+            <h3 class="text-[11px] font-bold text-blue-400 flex items-center gap-1 border-b border-slate-800 pb-1.5 mb-2">
+              <i data-lucide="messages-square" class="w-3.5 h-3.5 text-cyan-400"></i> ห้องแชทสดช่วยเหลือ (Live Chat)
+            </h3>
+            <div id="admin-chat-box" class="flex-1 overflow-y-auto space-y-1.5 p-2 bg-slate-900 rounded-xl text-[10px] mb-2 text-slate-300 border border-slate-800">
+              <p class="text-slate-500 italic text-center py-4">ยังไม่มีการเปิดแชทสดกับคนไข้</p>
+            </div>
+            <div class="flex gap-1">
+              <input type="text" id="admin-reply-msg-input" class="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-2 py-1 text-[10px] text-white focus:outline-none" placeholder="พิมพ์ตอบกลับ...">
+              <button onclick="sendLiveMessageFromAdmin()" class="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10px] rounded-lg transition">ส่ง</button>
+            </div>
+          </div>
+
+          <div class="bg-slate-950 border border-rose-950 rounded-2xl p-3 flex flex-col flex-1 min-h-[220px]">
+            <h3 class="text-[11px] font-bold text-rose-400 flex items-center gap-1 border-b border-slate-800 pb-1.5 mb-2">
+              <i data-lucide="users" class="w-3.5 h-3.5 text-rose-400"></i> ระบบลบและจัดการบัญชีสมาชิก
+            </h3>
+            <div class="overflow-y-auto flex-1 max-h-[240px]">
+              <table class="w-full text-left text-[10px] text-slate-300">
+                <thead>
+                  <tr class="border-b border-slate-800 text-slate-500 uppercase">
+                    <th class="p-1">ชื่อ / อีเมล</th>
+                    <th class="p-1 text-center">การจัดการ</th>
+                  </tr>
+                </thead>
+                <tbody id="db-users-table"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-8 bg-slate-950/40 border border-slate-800 rounded-2xl p-4 space-y-3 flex flex-col h-full">
+          <h3 class="text-xs font-bold text-emerald-400 flex items-center gap-1.5"><i data-lucide="calendar" class="w-4 h-4"></i> รายการคิวนัดหมายและการจัดการสถานะ</h3>
+          <div class="overflow-x-auto flex-1">
+            <table class="w-full text-left text-xs text-slate-300">
+              <thead>
+                <tr class="border-b border-slate-800 text-slate-400 text-[10px] uppercase">
+                  <th class="p-2">ข้อมูลผู้ป่วย</th>
+                  <th class="p-2">แพทย์ / วันที่นัด</th>
+                  <th class="p-2">ปรับสถานะ</th>
+                  <th class="p-2 text-center">จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="db-appointments-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    lucide.createIcons();
+
+    if (!localStorage.getItem('usersDB')) {
+      localStorage.setItem('usersDB', JSON.stringify([
+        { name: "ผู้ดูแลระบบ (Admin)", email: "admin@healthy.com", password: "1234", role: "admin" }
+      ]));
+    }
+    if (!localStorage.getItem('appointmentsDB')) {
+      localStorage.setItem('appointmentsDB', JSON.stringify([]));
+    }
+
+    const SYMPTOM_DICT = [
+      { keywords: ["จิตเวช", "ซึมเศร้า", "เครียด", "ดิ่ง", "คิดสั้น", "ท้อแท้", "นอนไม่หลับ"], title: "🆘 ศูนย์ช่วยเหลือสุขภาพจิตฉุกเฉิน", desc: "ความเครียดสะสมหรือภาวะโรคซึมเศร้าสามารถเยียวยาได้ครับ คุณไม่ได้อยู่ตัวคนเดียวบนโลกใบนี้", advice: "ติดต่อสายด่วนสุขภาพจิต โโทร 1323 หรือเลื่อนลงมาเปิดระบบ 'คุยสดกับแอดมินจิตแพทย์อาสา' ได้ทันทีครับ" },
+      { keywords: ["ปวดหัว", "ไข้", "ตัวร้อน", "เป็นหวัด"], title: "ปวดศีรษะ / ไข้หวัดเบื้องต้น", desc: "อาจเกิดจากความเครียด พักผ่อนไม่เพียงพอ หรือการติดเชื้อระบบทางเดินหายใจ", advice: "นอนพักผ่อนให้เพียงพอในห้องที่เงียบ ทานยาลดไข้พาราเซตามอลทุก 4-6 ชั่วโมง" },
+      { keywords: ["ปวดท้อง", "ท้องเสีย", "ท้องร่วง", "อ้วก"], title: "ปวดท้อง / ระบบทางเดินอาหาร", desc: "อาจเกิดจากอาหารเป็นพิษ กระเพาะอาหารอักเสบ หรือลำไส้ติดเชื้อ", advice: "จิบน้ำผสมเกลือแร่ (ORS) บ่อยๆ งดทานอาหารรสจัด" }
+    ];
+
+    let currentUserSession = null;
+    let isLiveChatActive = false;
+
+    const authScreen = document.getElementById('auth-screen');
+    const mainLayout = document.getElementById('main-layout');
+    const loginView = document.getElementById('login-view');
+    const registerView = document.getElementById('register-view');
+    const userDisplayName = document.getElementById('user-display-name');
+    const adminVerifyModal = document.getElementById('admin-verify-modal');
+    const adminDashboardModal = document.getElementById('admin-dashboard-modal');
+    const userProfileModal = document.getElementById('user-profile-modal');
+
+    function searchSymptoms() {
+      const query = document.getElementById('symptom-search-input').value.trim().toLowerCase();
+      const resultsBox = document.getElementById('search-results-box');
+      
+      if (!query) {
+        resultsBox.classList.add('hidden');
+        return;
+      }
+      const matched = SYMPTOM_DICT.filter(item => item.keywords.some(k => k.includes(query)));
+      if (matched.length === 0) {
+        resultsBox.innerHTML = `<p class="text-slate-400 italic text-center py-2">🔍 ไม่พบข้อมูลโดยตรง ลองสืบค้นด้วยคำอื่นครับ</p>`;
+      } else {
+        resultsBox.innerHTML = matched.map(item => `
+          <div class="bg-white p-3 rounded-xl border border-slate-200 space-y-1 text-slate-800">
+            <div class="font-bold text-brand-primary"> ${item.title}</div>
+            <p class="text-slate-500 text-[11px]">${item.desc}</p>
+            <p class="text-[11px] text-slate-700 bg-blue-50 p-1.5 rounded mt-1"><strong>คำแนะนำเบื้องต้น:</strong> ${item.advice}</p>
+          </div>
+        `).join('');
+      }
+      resultsBox.classList.remove('hidden');
+    }
+
+    // ================= 💬 ระบบควบคุมห้องแชท =================
+    const chatBox = document.getElementById('chat-box');
+    const chatOptions = document.getElementById('chat-options');
+    const adminChatBox = document.getElementById('admin-chat-box');
+    const chatModeBadge = document.getElementById('chat-mode-badge');
+    const chatHeaderTitle = document.getElementById('chat-header-title');
+    const liveChatInputArea = document.getElementById('live-chat-input-area');
+
+    function appendChatMessage(sender, text) {
+      const msg = document.createElement('div');
+      msg.className = sender === 'bot' || sender === 'admin'
+        ? "bg-blue-50 text-slate-700 p-3 rounded-2xl rounded-tl-none max-w-[85%] text-left"
+        : "bg-brand-primary text-white p-3 rounded-2xl rounded-tr-none max-w-[85%] ml-auto text-left";
+      
+      msg.innerHTML = sender === 'admin' ? `<strong>[แอดมินจิตแพทย์อาสา]:</strong> ${text}` : text;
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      syncToAdminDashboardChat(sender, text);
+    }
+
+    function syncToAdminDashboardChat(sender, text) {
+      if (!isLiveChatActive) return;
+      if(adminChatBox.querySelector('p.italic')) { adminChatBox.innerHTML = ''; }
+      const row = document.createElement('div');
+      row.className = sender === 'user' ? 'text-left mb-1' : 'text-right mb-1';
+      if(sender === 'user') {
+        row.innerHTML = `<span class="inline-block bg-slate-800 text-white p-1.5 rounded-xl max-w-[95%]"><strong>คนไข้:</strong> ${text}</span>`;
+      } else {
+        row.innerHTML = `<span class="inline-block bg-blue-900 text-blue-100 p-1.5 rounded-xl max-w-[95%]"><strong>คุณ:</strong> ${text}</span>`;
+      }
+      adminChatBox.appendChild(row);
+      adminChatBox.scrollTop = adminChatBox.scrollHeight;
+    }
+
+    function startChatFlow(type) {
+      chatOptions.innerHTML = ''; 
+      if(type === 'head') {
+        appendChatMessage('user', 'มีอาการปวดศีรษะ / ไข้');
+        setTimeout(() => {
+          appendChatMessage('bot', 'คุณมีอาการไข้สูงเกิน 38 องศาไหมครับ? หากมีอาการต่อเนื่องแนะนำจองคิวนัดหมายแพทย์ได้เลยครับ');
+          chatOptions.innerHTML = `<button onclick="resetChat()" class="px-3 py-1.5 bg-slate-200 rounded-xl">กลับไปเริ่มต้นใหม่</button>`;
+        }, 500);
+      } else if(type === 'stomach') {
+        appendChatMessage('user', 'มีอาการปวดท้อง / ทางเดินอาหาร');
+        setTimeout(() => {
+          appendChatMessage('bot', 'แนะนำให้จิบเกลือแร่บ่อยๆ และสังเกตอาการปวดเกร็งครับ หากรุนแรงควรไปพบแพทย์ทันที');
+          chatOptions.innerHTML = `<button onclick="resetChat()" class="px-3 py-1.5 bg-slate-200 rounded-xl">กลับไปเริ่มต้นใหม่</button>`;
+        }, 500);
+      } else if(type === 'mental') {
+        appendChatMessage('user', 'รู้สึกเครียด / ซึมเศร้า / จิตเวช (ดิ่ง)');
+        setTimeout(() => {
+          appendChatMessage('bot', 'รับทราบครับ... แนะนำต่อสายตรงแชทคุยสดกับแอดมินจิตแพทย์อาสาเพื่อระบายและช่วยเหลือได้ทันทีครับ');
+          chatOptions.innerHTML = `
+            <button onclick="connectToLiveAdmin()" class="px-4 py-2.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 shadow flex items-center gap-1.5">💬 เปิดห้องแชทคุยสดกับแอดมินทันที</button>
+            <button onclick="resetChat()" class="px-3 py-1.5 bg-slate-200 rounded-xl text-slate-700">ยกเลิก</button>
+          `;
+        }, 500);
+      }
+    }
+
+    function connectToLiveAdmin() {
+      isLiveChatActive = true;
+      chatOptions.innerHTML = '';
+      chatModeBadge.textContent = "🟢 โหมดแชทสดคุยกับแอดมิน";
+      chatModeBadge.className = "px-2.5 py-1 bg-emerald-500 text-white rounded-full text-[10px] font-bold animate-pulse";
+      chatHeaderTitle.innerHTML = `เจ้าหน้าที่ทีมจิตเวชกำลังสแตนบาย...`;
+      liveChatInputArea.classList.remove('hidden');
+      adminChatBox.innerHTML = `<div class="bg-blue-900/50 p-1 rounded text-blue-300 font-bold mb-1 text-center border border-blue-800 text-[9px]">🚨 คนไข้เปิดห้องแชทสดเข้ามา!</div>`;
+      setTimeout(() => {
+        appendChatMessage('admin', 'สวัสดีครับ ผมเป็นทีมแอดมินและจิตแพทย์อาสาของ Healthy Advice นะครับ มีเรื่องอึดอัดใจส่วนไหนพิมพ์เล่ามาได้เลยครับ');
+      }, 700);
+    }
+
+    function sendLiveMessageFromUser() {
+      const input = document.getElementById('live-chat-user-msg');
+      const text = input.value.trim();
+      if(!text) return;
+      appendChatMessage('user', text);
+      input.value = '';
+    }
+
+    function sendLiveMessageFromAdmin() {
+      const input = document.getElementById('admin-reply-msg-input');
+      const text = input.value.trim();
+      if(!text) return;
+      if(!isLiveChatActive) { return alert('❌ ยังไม่มีผู้ใช้งานเปิดห้องแชทสดเข้ามาครับ'); }
+      appendChatMessage('admin', text);
+      input.value = '';
+    }
+
+    function resetChat() {
+      isLiveChatActive = false;
+      liveChatInputArea.classList.add('hidden');
+      chatModeBadge.textContent = "โหมดบอทอัตโนมัติ";
+      chatModeBadge.className = "px-2.5 py-1 bg-blue-50 text-blue-700 rounded-full text-[10px] font-bold";
+      chatBox.innerHTML = `<div class="bg-blue-50 text-slate-700 p-3 rounded-2xl rounded-tl-none max-w-[85%]">สวัสดีครับ ผมคือระบบคัดกรองอาการเบื้องต้น คุณเริ่มมีอาการไม่สบายในส่วนไหนครับ?</div>`;
+      chatOptions.innerHTML = `
+        <button onclick="startChatFlow('head')" class="px-3 py-2 bg-slate-100 hover:bg-brand-primary hover:text-white rounded-xl transition text-xs font-medium">ปวดศีรษะ / ไข้</button>
+        <button onclick="startChatFlow('stomach')" class="px-3 py-2 bg-slate-100 hover:bg-brand-primary hover:text-white rounded-xl transition text-xs font-medium">ปวดท้อง / ทางเดินอาหาร</button>
+        <button onclick="startChatFlow('mental')" class="px-3 py-2 bg-blue-50 hover:bg-blue-700 hover:text-white text-blue-700 rounded-xl transition text-xs font-medium border border-blue-200">เครียด / ซึมเศร้า / จิตเวช (ดิ่ง)</button>
+      `;
+      adminChatBox.innerHTML = `<p class="text-slate-500 italic text-center py-4">ยังไม่มีการเปิดห้องแชทสดกับคนไข้ในขณะนี้</p>`;
+    }
+
+    // ================= ระบบโปรไฟล์ & [ระบบลบบัญชีผู้ใช้ของ User] =================
+    function openUserProfileModal() {
+      if(!currentUserSession) return;
+      document.getElementById('prof-name').value = currentUserSession.name;
+      document.getElementById('prof-email').value = currentUserSession.email;
+      document.getElementById('prof-password').value = currentUserSession.password;
+      renderUserOwnAppointments();
+      userProfileModal.classList.remove('hidden');
+    }
+    function closeUserProfileModal() { userProfileModal.classList.add('hidden'); }
+
+    function deleteCurrentUserAccount() {
+      if (!currentUserSession) return;
+      if (currentUserSession.role === 'admin' || currentUserSession.email === 'admin@healthy.com') {
+        return alert('❌ ไม่สามารถลบบัญชีผู้ดูแลระบบหลักได้ครับ!');
+      }
+
+      const confirmFirst = confirm(`⚠️ คุณแน่ใจหรือไม่ที่จะทำการ "ลบบัญชีผู้ใช้" ของคุณออกจากระบบอย่างถาวร?`);
+      if (confirmFirst) {
+        const confirmSecond = confirm(`🚨 ยืนยันรอบสุดท้าย! รายการประวัตินัดหมายแพทย์และโปรไฟล์ทั้งหมดจะหายไปทันที`);
+        if (confirmSecond) {
+          let users = JSON.parse(localStorage.getItem('usersDB')) || [];
+          let appointments = JSON.parse(localStorage.getItem('appointmentsDB')) || [];
+          const targetEmail = currentUserSession.email;
+
+          let updatedUsers = users.filter(u => u.email.toLowerCase() !== targetEmail.toLowerCase());
+          let updatedAppointments = appointments.filter(a => a.ownerEmail.toLowerCase() !== targetEmail.toLowerCase());
+
+          localStorage.setItem('usersDB', JSON.stringify(updatedUsers));
+          localStorage.setItem('appointmentsDB', JSON.stringify(updatedAppointments));
+
+          alert('🗑️ ลบบัญชีผู้ใช้งานของคุณออกจากระบบเรียบร้อยแล้ว!');
+          closeUserProfileModal();
+          logout();
+        }
+      }
+    }
+
+    function renderUserOwnAppointments() {
+      const appointments = JSON.parse(localStorage.getItem('appointmentsDB')) || [];
+      const container = document.getElementById('user-own-appointments');
+      container.innerHTML = '';
+      const myApps = appointments.filter(a => a.ownerEmail === currentUserSession.email);
+      if(myApps.length === 0) {
+        container.innerHTML = `<p class="text-slate-400 text-center py-6 text-xs">คุณยังไม่มีรายการจองคิวนัดหมายแพทย์ในระบบ</p>`;
+        return;
+      }
+      myApps.forEach(a => {
+        container.innerHTML += `
+          <div class="bg-white p-3 rounded-xl border border-slate-200 text-xs shadow-sm flex justify-between items-center">
+            <div>
+              <span class="font-bold text-slate-800">${a.doctor}</span>
+              <p class="text-slate-500 text-[11px] mt-0.5">คนไข้: ${a.name} | วันที่นัด: <span class="font-mono text-blue-600">${a.date}</span></p>
+            </div>
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${a.status==='อนุมัติแล้ว'?'bg-emerald-50 text-emerald-600':'bg-amber-50 text-amber-600'}">${a.status}</span>
+          </div>`;
+      });
+    }
+
+    document.getElementById('update-profile-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      let users = JSON.parse(localStorage.getItem('usersDB'));
+      const idx = users.findIndex(u => u.email === currentUserSession.email);
+      if(idx !== -1) {
+        users[idx].name = document.getElementById('prof-name').value.trim();
+        users[idx].password = document.getElementById('prof-password').value;
+        localStorage.setItem('usersDB', JSON.stringify(users));
+        currentUserSession = users[idx];
+        userDisplayName.textContent = currentUserSession.name;
+        alert('อัปเดตข้อมูลผู้ใช้งานสำเร็จ!');
+        closeUserProfileModal();
+      }
+    });
+
+    // ================= ระบบจัดการแดชบอร์ดหลังบ้านแอดมิน & [ระบบลบบัญชีโดยแอดมิน] =================
+    function triggerAdminVerification() { adminVerifyModal.classList.remove('hidden'); }
+    function closeAdminVerifyModal() { adminVerifyModal.classList.add('hidden'); }
+
+    document.getElementById('admin-verify-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('verify-email-input').value.trim();
+      const pass = document.getElementById('verify-pass-input').value;
+      const users = JSON.parse(localStorage.getItem('usersDB'));
+      const isAdmin = users.find(u => u.email === email && u.password === pass && u.role === 'admin');
+
+      if (isAdmin) {
+        closeAdminVerifyModal();
+        loadTableDataToDashboard();
+        loadUsersDataToDashboard(); // โหลดรายชื่อผู้ใช้เพื่อลบข้อมูล
+        adminDashboardModal.classList.remove('hidden');
+      } else { alert('❌ อีเมลหรือรหัสผ่านแอดมินไม่ถูกต้อง!'); }
+    });
+
+    function closeAdminDashboardModal() { adminDashboardModal.classList.add('hidden'); }
+
+    // ฟังก์ชันโหลดและแสดงรายชื่อสมาชิกเพื่อให้แอดมินสั่งลบได้
+    function loadUsersDataToDashboard() {
+      const users = JSON.parse(localStorage.getItem('usersDB')) || [];
+      const uBody = document.getElementById('db-users-table');
+      
+      uBody.innerHTML = users.map((u) => {
+        const isAdmin = u.role === 'admin' || u.email === 'admin@healthy.com';
+        return `
+          <tr class="border-b border-slate-800 hover:bg-slate-800/20">
+            <td class="p-1.5">
+              <div class="font-bold text-slate-200">${u.name}</div>
+              <div class="text-slate-500 font-mono text-[9px]">${u.email}</div>
+            </td>
+            <td class="p-1.5 text-center">
+              ${isAdmin ? 
+                `<span class="text-[9px] bg-blue-950 text-blue-400 px-1.5 py-0.5 rounded font-bold">Admin</span>` : 
+                `<button onclick="adminDeleteUserAccount('${u.email}')" class="px-2 py-1 bg-rose-950/60 hover:bg-rose-700 text-rose-400 hover:text-white rounded transition text-[9px] font-bold">ลบบัญชี</button>`
+              }
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ฟังก์ชันสั่งลบบัญชีผู้ใช้จากสิทธิ์ของแอดมิน
+    function adminDeleteUserAccount(targetEmail) {
+      if (confirm(`🚨 แอดมินยืนยันที่จะทำการลบบัญชีผู้ใช้ [ ${targetEmail} ] หรือไม่?\n(การลบนี้จะลบทั้งไอดีและคิวนัดหมายของเขาทั้งหมดถาวร)`)) {
+        let users = JSON.parse(localStorage.getItem('usersDB')) || [];
+        let appointments = JSON.parse(localStorage.getItem('appointmentsDB')) || [];
+
+        let updatedUsers = users.filter(u => u.email.toLowerCase() !== targetEmail.toLowerCase());
+        let updatedAppointments = appointments.filter(a => a.ownerEmail.toLowerCase() !== targetEmail.toLowerCase());
+
+        localStorage.setItem('usersDB', JSON.stringify(updatedUsers));
+        localStorage.setItem('appointmentsDB', JSON.stringify(updatedAppointments));
+
+        alert(`🗑️ ลบบัญชีผู้ใช้ ${targetEmail} เรียบร้อยแล้ว!`);
+        loadUsersDataToDashboard(); // รีเฟรชตารางผู้ใช้
+        loadTableDataToDashboard(); // รีเฟรชตารางนัดหมาย
+      }
+    }
+
+    function loadTableDataToDashboard() {
+      const appointments = JSON.parse(localStorage.getItem('appointmentsDB')) || [];
+      const aBody = document.getElementById('db-appointments-table');
+      
+      if(appointments.length === 0) {
+        aBody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500 italic">ไม่มีข้อมูลคิวนัดหมายในระบบ</td></tr>`;
+      } else {
+        aBody.innerHTML = appointments.map((a, i) => `
+          <tr class="border-b border-slate-800 text-[11px] hover:bg-slate-800/40">
+            <td class="p-2 text-white font-bold">${a.name}<br><span class="text-slate-400 text-[10px] font-mono">${a.phone}</span></td>
+            <td class="p-2 text-slate-300">${a.doctor}<br><span class="text-blue-400 font-mono">${a.date}</span></td>
+            <td class="p-2">
+              <select onchange="updateAppointmentStatus(${i}, this.value)" class="bg-slate-800 border border-slate-700 rounded text-xs px-1 py-0.5 text-white">
+                <option value="รอดำเนินการ" ${a.status==='รอดำเนินการ'?'selected':''}>รอดำเนินการ</option>
+                <option value="อนุมัติแล้ว" ${a.status==='อนุมัติแล้ว'?'selected':''}>อนุมัติแล้ว</option>
+                <option value="เสร็จสิ้น" ${a.status==='เสร็จสิ้น'?'selected':''}>เสร็จสิ้น</option>
+              </select>
+            </td>
+            <td class="p-2 text-center">
+              <button onclick="deleteAppointment(${i})" class="text-rose-400 hover:text-rose-600 transition"><i data-lucide="trash" class="w-3.5 h-3.5"></i></button>
+            </td>
+          </tr>
+        `).join('');
+      }
+      lucide.createIcons();
+    }
+
+    function updateAppointmentStatus(idx, status) {
+      let apps = JSON.parse(localStorage.getItem('appointmentsDB'));
+      apps[idx].status = status;
+      localStorage.setItem('appointmentsDB', JSON.stringify(apps));
+      loadTableDataToDashboard();
+    }
+
+    function deleteAppointment(idx) {
+      if(confirm('ยืนยันที่จะลบข้อมูลคิวจองนัดหมายแพทย์รายการนี้ใช่ไหม?')) {
+        let apps = JSON.parse(localStorage.getItem('appointmentsDB'));
+        apps.splice(idx, 1);
+        localStorage.setItem('appointmentsDB', JSON.stringify(apps));
+        loadTableDataToDashboard();
+      }
+    }
+
+    // ================= ระบบจัดการบัญชีผู้ใช้ (AUTH) =================
+    function toggleAuthMode(mode) {
+      if (mode === 'register') { loginView.classList.add('hidden'); registerView.classList.remove('hidden'); } 
+      else { registerView.classList.add('hidden'); loginView.classList.remove('hidden'); }
+    }
+
+    document.getElementById('register-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('reg-name').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const password = document.getElementById('reg-password').value;
+
+      let currentUsers = JSON.parse(localStorage.getItem('usersDB'));
+      if (currentUsers.some(user => user.email === email)) { return alert('อีเมลนี้ถูกลงทะเบียนระบบไว้แล้ว'); }
+      currentUsers.push({ name, email, password, role: 'user' });
+      localStorage.setItem('usersDB', JSON.stringify(currentUsers));
+      alert('ลงทะเบียนสำเร็จ!');
+      e.target.reset();
+      toggleAuthMode('login');
+    });
+
+    document.getElementById('login-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      const currentUsers = JSON.parse(localStorage.getItem('usersDB'));
+      const matchedUser = currentUsers.find(user => user.email === email && user.password === password);
+
+      if (matchedUser) {
+        currentUserSession = matchedUser;
+        userDisplayName.textContent = matchedUser.name;
+        authScreen.classList.add('hidden');
+        mainLayout.classList.remove('hidden');
+        window.scrollTo({ top: 0 });
+      } else { alert('ชื่ออีเมลผู้ใช้ หรือรหัสผ่านไม่ถูกต้อง'); }
+    });
+
+    function logout() {
+      currentUserSession = null;
+      mainLayout.classList.add('hidden');
+      authScreen.classList.remove('hidden');
+      resetChat();
+    }
+
+    document.getElementById('appointment-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      let currentApps = JSON.parse(localStorage.getItem('appointmentsDB')) || [];
+      currentApps.push({ 
+        ownerEmail: currentUserSession.email,
+        name: document.getElementById('ap-name').value.trim(), 
+        phone: document.getElementById('ap-phone').value.trim(), 
+        doctor: document.getElementById('ap-doctor').value, 
+        date: document.getElementById('ap-date').value,
+        status: 'รอดำเนินการ'
+      });
+      localStorage.setItem('appointmentsDB', JSON.stringify(currentApps));
+      alert('ส่งข้อมูลจองคิวนัดหมายสำเร็จ! คุณสามารถเช็คประวัติได้ที่รูปโปรไฟล์ของคุณด้านบนครับ');
+      e.target.reset();
+    });
+  </script>
+ </body>
+</html>
